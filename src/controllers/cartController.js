@@ -1,5 +1,6 @@
 import cartModel from "../models/cart.js"
 import productModel from "../models/products.js"
+import ticketmodel from "../models/ticket.js"
 
 export const getCart = async (req, res) => {
     try {
@@ -57,9 +58,17 @@ export const createTicket = async (req, res) => {
             }
         })
         if (prodSinStock.length == 0) {
-
+            const totalPrice = cart.products.reduce((a,b) => (a.price * a.quantity) + (b.price * b.quantity))
+            const newTicket = await ticketmodel.create({
+                code: crypto.randomUUID(),
+                purchaser: req.user.email,
+                amount: totalPrice,
+                products: cart.products
+            })
+            // pendiente vaciar el carrito
+            res.status(200).send(newTicket)
             } else {
-
+                // Pendiente retornar productos sin stock
             }
         } else {
             res.status(404).send("El carrito no existe")
